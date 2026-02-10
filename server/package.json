@@ -1,24 +1,29 @@
 {
-  "name": "server",
+  "name": "athlete-tracker-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend API for Athlete Tracker application",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["athlete", "tracker", "api", "express", "mongodb"],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.13.4",
     "bcrypt": "^6.0.0",
-    "cheerio": "^1.2.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.1.5",
-    "nodemon": "^3.1.11",
-    "puppeteer-core": "^24.37.2"
+    "mongoose": "^9.1.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
