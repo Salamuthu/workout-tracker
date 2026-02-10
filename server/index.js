@@ -9,13 +9,18 @@ const auth = require("./middleware/auth");
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY || "your_secret_key";
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://praveenjayathilake22_db_user:IMBuuF6dy6cI7aIS@cluster0.gmgl2nc.mongodb.net/?appName=Cluster0";
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5174";
 
 const app = express();
 
-// CORS Configuration
+// CORS Configuration - Updated for production
 app.use(cors({
-    origin: [FRONTEND_URL, "http://localhost:5173", "http://localhost:3000"],
+    origin: [
+        "http://localhost:5174",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        FRONTEND_URL
+    ].filter(Boolean), // Remove undefined values
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
