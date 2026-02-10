@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./LogWorkoutSheet.css"
+import API_URL from "../config/api.js";
 
 
 
@@ -132,7 +133,7 @@ const LogWorkoutSheet = ({ open, onClose, onSave }) => {
         }
 
         try {
-            const response = await fetch("http://localhost:3000/api/workouts", {
+            const response = await fetch(`${API_URL}/api/workouts`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

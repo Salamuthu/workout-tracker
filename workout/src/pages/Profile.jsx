@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../config/api.js";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ const Profile = () => {
             try {
                 // Fetch profile
                 const profileRes = await axios.get(
-                    "http://localhost:3000/api/profile/me",
+                    `${API_URL}/api/profile/me`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -38,7 +39,7 @@ const Profile = () => {
 
                 // Fetch competitions
                 const compRes = await axios.get(
-                    "http://localhost:3000/api/competitions",
+                    `${API_URL}/api/competitions`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -72,7 +73,7 @@ const Profile = () => {
 
                 // Fetch workouts for strength PRs
                 const workoutRes = await axios.get(
-                    "http://localhost:3000/api/workouts",
+                    `${API_URL}/api/workouts`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

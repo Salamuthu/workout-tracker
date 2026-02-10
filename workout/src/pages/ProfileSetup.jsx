@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ProfileSetup.css";
+import API_URL from "../config/api.js";
 
 const ProfileSetup = () => {
     const navigate = useNavigate();
@@ -31,7 +32,7 @@ const ProfileSetup = () => {
 
             try {
                 const res = await axios.get(
-                    "http://localhost:3000/api/profile/me",
+                    `${API_URL}/api/profile/me`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -123,7 +124,7 @@ const ProfileSetup = () => {
             const personalBestValue = normalizePB(form.personalBestValue);
 
             await axios.post(
-                "http://localhost:3000/api/profile",
+                `${API_URL}/api/profile`,
                 {
                     fullName: form.fullName,
                     mainEvent,

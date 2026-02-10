@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../config/api.js";
 
 const Records = () => {
     const navigate = useNavigate();
@@ -35,19 +36,19 @@ const Records = () => {
 
         try {
             // Fetch profile
-            const profileRes = await axios.get("http://localhost:3000/api/profile/me", {
+            const profileRes = await axios.get(`${API_URL}/api/profile/me`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setProfile(profileRes.data);
 
             // Fetch competitions
-            const compRes = await axios.get("http://localhost:3000/api/competitions", {
+            const compRes = await axios.get(`${API_URL}/api/competitions`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCompetitions(compRes.data.competitions || []);
 
             // Fetch workouts
-            const workoutRes = await axios.get("http://localhost:3000/api/workouts", {
+            const workoutRes = await axios.get(`${API_URL}/api/workouts`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setWorkouts(workoutRes.data.workouts || []);

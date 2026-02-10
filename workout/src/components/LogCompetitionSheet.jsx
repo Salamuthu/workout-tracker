@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import axios from "axios";
+import API_URL from "../config/api.js";
 
 const LogCompetitionSheet = ({ isOpen, onClose, onSave }) => {
     const [raceTime, setRaceTime] = useState("00:00:00");
@@ -101,7 +102,7 @@ const LogCompetitionSheet = ({ isOpen, onClose, onSave }) => {
             };
 
             const response = await axios.post(
-                "http://localhost:3000/api/competitions",
+                `${API_URL}/api/competitions`,
                 competitionData,
                 {
                     headers: {
