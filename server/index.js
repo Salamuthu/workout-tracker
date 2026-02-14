@@ -4,7 +4,6 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Workout = require("./models/Workout");
-const auth = require("./middleware/auth");
 
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY || "your_secret_key";
@@ -13,14 +12,14 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5174";
 
 const app = express();
 
-// CORS Configuration - Updated for production
+// CORS Configuration
 app.use(cors({
     origin: [
         "http://localhost:5174",
         "http://localhost:5173",
         "http://localhost:3000",
         FRONTEND_URL
-    ].filter(Boolean), // Remove undefined values
+    ].filter(Boolean),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -85,68 +84,83 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/signup", async (req, res) => {
-    const { username, email, password } = req.body;
+    try {
+        const { username, email, password } = req.body;
 
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: "Email already used" });
+        const existing = await User.findOne({ email });
+        if (existing) return res.status(400).json({ message: "Email already used" });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
-    await user.save();
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({ username, email, password: hashedPassword });
+        await user.save();
 
-    const token = jwt.sign({ userId: user._id }, SECRET_KEY, {
-        expiresIn: "24h",
-    });
+        const token = jwt.sign({ userId: user._id }, SECRET_KEY, {
+            expiresIn: "24h",
+        });
 
-    res.status(201).json({ message: "Signup successful", token });
+        res.status(201).json({ message: "Signup successful", token });
+    } catch (err) {
+        console.error("Signup error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 app.post("/api/login", async (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+        const user = await User.findOne({ email });
+        if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-        return res.status(401).json({ message: "Invalid credentials" });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch)
+            return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ userId: user._id }, SECRET_KEY, {
-        expiresIn: "24h",
-    });
+        const token = jwt.sign({ userId: user._id }, SECRET_KEY, {
+            expiresIn: "24h",
+        });
 
-    res.json({ message: "Login successful", token });
+        res.json({ message: "Login successful", token });
+    } catch (err) {
+        console.error("Login error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 app.post("/api/profile", authMiddleware, async (req, res) => {
-    const {
-        fullName,
-        mainEvent,
-        otherEvents,
-        personalBestValue,
-        heightCm,
-        weightKg,
-        trainingDaysPerWeek,
-    } = req.body;
+    try {
+        const {
+            fullName,
+            mainEvent,
+            otherEvents,
+            personalBestValue,
+            heightCm,
+            weightKg,
+            trainingDaysPerWeek,
+        } = req.body;
 
-    const bmi = Number(
-        (weightKg / Math.pow(heightCm / 100, 2)).toFixed(1)
-    );
+        const bmi = Number(
+            (weightKg / Math.pow(heightCm / 100, 2)).toFixed(1)
+        );
 
-    const profile = new AthleteProfile({
-        userId: req.userId,
-        fullName,
-        mainEvent,
-        otherEvents,
-        personalBestValue,
-        heightCm,
-        weightKg,
-        bmi,
-        trainingDaysPerWeek,
-    });
+        const profile = new AthleteProfile({
+            userId: req.userId,
+            fullName,
+            mainEvent,
+            otherEvents,
+            personalBestValue,
+            heightCm,
+            weightKg,
+            bmi,
+            trainingDaysPerWeek,
+        });
 
-    await profile.save();
-    res.status(201).json({ message: "Profile created" });
+        await profile.save();
+        res.status(201).json({ message: "Profile created" });
+    } catch (err) {
+        console.error("Profile creation error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 app.get("/api/profile/me", authMiddleware, async (req, res) => {
@@ -161,11 +175,12 @@ app.get("/api/profile/me", authMiddleware, async (req, res) => {
 
         res.json(profile);
     } catch (err) {
+        console.error("Get profile error:", err);
         res.status(500).json({ message: "Server error" });
     }
 });
 
-app.post("/api/workouts", auth, async (req, res) => {
+app.post("/api/workouts", authMiddleware, async (req, res) => {
     try {
         const workout = new Workout({
             userId: req.userId,
@@ -175,12 +190,12 @@ app.post("/api/workouts", auth, async (req, res) => {
         await workout.save();
         res.status(201).json({ message: "Workout saved successfully" });
     } catch (err) {
-        console.error(err);
+        console.error("Save workout error:", err);
         res.status(500).json({ message: "Failed to save workout" });
     }
 });
 
-app.get("/api/workouts", auth, async (req, res) => {
+app.get("/api/workouts", authMiddleware, async (req, res) => {
     try {
         const workouts = await Workout.find({ userId: req.userId })
             .sort({ createdAt: -1 })
@@ -191,7 +206,7 @@ app.get("/api/workouts", auth, async (req, res) => {
             workouts
         });
     } catch (err) {
-        console.error(err);
+        console.error("Get workouts error:", err);
         res.status(500).json({
             success: false,
             message: "Failed to fetch workouts"
